@@ -22,8 +22,20 @@ class ScannedResultUtil {
             fun isReceiptQR(rawString: String): Boolean {
                 return rawString.length >= 77
                         && isCharacterString(rawString.substring(0,2))
-                        && isDigitString(rawString.substring(2, 53))
+                        && isDigitString(rawString.substring(2, 21))
+                        && isHex(rawString.substring(21, 37))
+                        && isDigitString(rawString.substring(37, 53))
                         && isBase64(rawString.substring(53, 77))
+            }
+
+            private fun isHex(string: String): Boolean {
+                return string.all { char -> char.isDigit()
+                        || char.equals('a', true)
+                        || char.equals('b', true)
+                        || char.equals('c', true)
+                        || char.equals('d', true)
+                        || char.equals('e', true)
+                        || char.equals('f', true)}
             }
 
             fun isDigitString(string: String): Boolean {
