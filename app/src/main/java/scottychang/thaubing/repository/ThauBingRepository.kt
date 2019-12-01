@@ -12,8 +12,8 @@ class ThauBingRepository() {
     private lateinit var apiService: ThauBingApi
 
     fun getMetaData(taxID: String, callback : MyCallback<String>) {
-        val dada = apiService.getMetaDataByTaxID(taxID)
-        dada.enqueue(object: retrofit2.Callback<String> {
+        val result = apiService.getMetaDataByTaxID(taxID)
+        result.enqueue(object: retrofit2.Callback<String> {
             override fun onFailure(call: Call<String>, t: Throwable) {
                 callback.onFailure(Exception(t))
             }
@@ -33,7 +33,7 @@ class ThauBingRepository() {
             baseUrl(API_URL).
             client(getApiClient()).
             addConverterFactory(ScalarsConverterFactory.create()).
-            build();
+            build()
         apiService = retrofit.create(ThauBingApi::class.java)
     }
 
