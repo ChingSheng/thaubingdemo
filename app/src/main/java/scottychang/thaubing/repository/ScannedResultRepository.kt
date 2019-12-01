@@ -28,13 +28,15 @@ class ScannedResultRepository {
     fun getScannedResult(rawString: String, callback: ScannedResultCallback) {
         val item = ScannedItem(rawString)
         if (item.scannedType == ScannedItem.Type.GS1_BAR) {
-            updateGS1Metadata(item, callback)
+            updateMetadata(item, callback)
+        } else if (item.scannedType == ScannedItem.Type.RECEIPT_QR || item.scannedType == ScannedItem.Type.TAX_ID) {
+            getNameByTaxID(item.taxID, item, callback)
         } else {
             callback.onComplete(item)
         }
     }
 
-    private fun updateGS1Metadata(item: ScannedItem, callback: ScannedResultCallback) {
+    private fun updateMetadata(item: ScannedItem, callback: ScannedResultCallback) {
         Thread(Runnable {
             Jsoup.connect(GS1_QUERY_URL).data(GS1_QUERY_KEY, item.rawString).execute()?.let {
                 it.parse()?.let {
@@ -45,7 +47,7 @@ class ScannedResultRepository {
                     item.metaData = name
 
                     if (name.isNotEmpty()) {
-                        getTaxIDIfPossible(name, callback, item)
+                        getTaxIDByName(name, item, callback)
                     } else {
                         handler.post { callback.onComplete(item) }
                     }
@@ -55,12 +57,12 @@ class ScannedResultRepository {
     }
 
     @WorkerThread
-    private fun getTaxIDIfPossible(
+    private fun getTaxIDByName(
         name: String,
-        callback: ScannedResultCallback,
-        item: ScannedItem
+        item: ScannedItem,
+        callback: ScannedResultCallback
     ) {
-        val queryResult = apiService.getCompanyData(name).execute()
+        val queryResult = apiService.getCompanyDataByName(name).execute()
         if (queryResult.isSuccessful) {
             queryResult.body()?.let {
                 val companyArray = it.getAsJsonArray("data")
@@ -78,6 +80,33 @@ class ScannedResultRepository {
             Log.w(TAG, queryResult.code().toString() + " / " + queryResult.errorBody()?.string())
             handler.post { callback.onComplete(item) }
         }
+    }
+
+    private fun getNameByTaxID(
+        taxID: String,
+        item: ScannedItem,
+        callback: ScannedResultCallback
+    ) {
+        Thread(Runnable {
+            val queryResult = apiService.getCompanyDataByID(taxID).execute()
+            if (queryResult.isSuccessful) {
+                queryResult.body()?.let {
+                    val company = it.getAsJsonObject("data")
+                    if (company != null) {
+                        val detailData = company.get("財政部") as JsonObject
+                        if (detailData.has("營業人名稱")) item.metaData = detailData.get("營業人名稱").asString
+                        if (detailData.has("總機構統一編號") && detailData.get("總機構統一編號").asString?.length == 8) item.taxID = detailData.get("總機構統一編號").asString
+                        handler.post { callback.onComplete(item) }
+                    }
+                } ?: run {
+                    Log.d(TAG, "No body message ?")
+                    handler.post { callback.onComplete(item) }
+                }
+            } else {
+                Log.w(TAG, queryResult.code().toString() + " / " + queryResult.errorBody()?.string())
+                handler.post { callback.onComplete(item) }
+            }
+        }).start()
     }
 
     init {
