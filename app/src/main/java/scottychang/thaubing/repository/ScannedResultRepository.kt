@@ -89,7 +89,7 @@ class ScannedResultRepository {
             .baseUrl(COMPANY_QUERY_API_URL)
             .client(getApiClient())
             .addConverterFactory(GsonConverterFactory.create())
-            .build();
+            .build()
         apiService = retrofit.create(CompanyQueryApi::class.java)
     }
 
