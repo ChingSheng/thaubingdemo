@@ -94,8 +94,13 @@ class ScannedResultRepository {
                     val company = it.getAsJsonObject("data")
                     if (company != null) {
                         val detailData = company.get("財政部") as JsonObject
-                        if (detailData.has("營業人名稱")) item.metaData = detailData.get("營業人名稱").asString
-                        if (detailData.has("總機構統一編號") && detailData.get("總機構統一編號").asString?.length == 8) item.taxID = detailData.get("總機構統一編號").asString
+                        if (detailData.has("營業人名稱")) {
+                            item.metaData = detailData.get("營業人名稱").asString
+                        }
+                        if (detailData.has("總機構統一編號")
+                            && detailData.get("總機構統一編號").asString?.length == 8) {   // This data may not exist from api
+                            item.taxID = detailData.get("總機構統一編號").asString
+                        }
                         handler.post { callback.onComplete(item) }
                     }
                 } ?: run {
