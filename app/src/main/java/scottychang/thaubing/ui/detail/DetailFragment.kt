@@ -36,7 +36,7 @@ class DetailFragment : Fragment(), LifecycleObserver {
         super.onViewCreated(view, savedInstanceState)
         scannedItem =  arguments!!.getParcelable<ScannedItem>(EXTRA_SCANNED_ITEM)!!
         type.text = "掃描種類: " + scannedItem.scannedType.name
-        tax_id.text = if (scannedItem.taxID.isNotEmpty()) "統一編號: " + scannedItem.taxID else "未知的統一編號"
+        tax_id.text = if (scannedItem.taxID.isNotEmpty()) "統一編號: " + scannedItem.taxID + " (" + scannedItem.metaData + ")" else "未知的統一編號"
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
