@@ -9,7 +9,8 @@ class ScannedResultUtil {
 
             fun isGS1Bar(rawString: String): Boolean {
                 return rawString.length == 13
-                        && isDigitString(rawString)
+                        && rawString.substring(0,3).equals("471")   // Region code: TW
+                        && isDigitString(rawString.substring(3, 13))
             }
 
             fun isReceiptBar(rawString: String): Boolean {
