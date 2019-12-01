@@ -12,11 +12,13 @@ class ScannedItem() : Parcelable {
     var rawString = ""
     var scannedType = Type.UNKNOWN
     var taxID = ""
+    var metaData = ""
 
     constructor(parcel: Parcel) : this() {
         rawString = parcel.readString() ?: ""
         taxID = parcel.readString() ?: ""
         scannedType = Type.values()[(parcel.readInt())]
+        metaData = parcel.readString() ?: ""
     }
 
     constructor(rawString : String) : this() {
@@ -57,6 +59,7 @@ class ScannedItem() : Parcelable {
         parcel.writeString(rawString)
         parcel.writeString(taxID)
         parcel.writeInt(scannedType.ordinal)
+        parcel.writeString(metaData)
     }
 
     override fun describeContents(): Int {
