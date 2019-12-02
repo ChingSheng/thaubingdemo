@@ -14,9 +14,9 @@ import scottychang.thaubing.model.ScannedItem
 
 class ScannedResultRepository {
     private val TAG = this.javaClass.simpleName
-    private val GS1_QUERY_URL = "http://www.gs1tw.org/twct/web/codesearch_send.jsp?"
+    private val GS1_QUERY_URL = "https://www.gs1tw.org/twct/web/codesearch_send.jsp?"
     private val GS1_QUERY_KEY = "MCANNO"
-    private val COMPANY_QUERY_API_URL = "http://company.g0v.ronny.tw/api/"
+    private val COMPANY_QUERY_API_URL = "https://company.g0v.ronny.tw/api/"
 
     private lateinit var apiService: CompanyQueryApi
     private val handler = Handler(Looper.getMainLooper())
