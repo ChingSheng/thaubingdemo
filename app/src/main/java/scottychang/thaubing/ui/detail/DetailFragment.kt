@@ -6,8 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
+import com.google.gson.GsonBuilder
 import kotlinx.android.synthetic.main.detail_fragment.*
 import scottychang.thaubing.R
+import scottychang.thaubing.model.CorpPenaltyRecord
 import scottychang.thaubing.model.ScannedItem
 
 class DetailFragment : Fragment(), LifecycleObserver {
@@ -46,7 +48,8 @@ class DetailFragment : Fragment(), LifecycleObserver {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(DetailViewModel::class.java)
-        viewModel.showTaxIDMetaData.observe(this, Observer<String> { t -> detail_raw.text = t })
+        viewModel.showTaxIDMetaData.observe(this, Observer<CorpPenaltyRecord> { record -> detail_raw.text = GsonBuilder().setPrettyPrinting().create().toJson(record) })
+        viewModel.showErrorMessage.observe(this, Observer { errorMessage -> detail_raw.text = errorMessage })
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
